@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Special Letter for You</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Great+Vibes&family=Lora:ital,wght@0,400;0,500;1,400&family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        /**
+         * Helper to insert a romantic interactive emoji.
+         * Usage: Emoji('❤') 
+         */
+        function Emoji(symbol) {
+            return `<span class="love-emoji" onclick="event.stopPropagation(); triggerEmojiPop(this)">${symbol}</span>`;
+        }
+    </script>
+
+    <style>
+        :root {
+            --primary-pink: #ff85a1;
+            --soft-pink: #fce4ec;
+            --deep-rose: #d81b60;
+            --parchment: #fffdfa;
+            --border-color: #ef9a9a;
+            --inner-border: rgba(216, 27, 96, 0.2);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--soft-pink);
+            font-family: 'Quicksand', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        .background-decor {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .heart {
+            position: absolute;
+            color: rgba(216, 27, 96, 0.15);
+            animation: float 15s linear infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+
+        .envelope-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1000px;
+        }
+
+        .envelope-wrapper {
+            position: relative;
+            cursor: pointer;
+            width: 320px;
+            height: 220px;
+            transition: transform 0.3s;
+        }
+
+        .envelope-wrapper:not(.open):hover { transform: scale(1.05); }
+
+        .envelope {
+            position: relative;
+            width: 100%; height: 100%;
+            background: #ffffff;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            z-index: 10; /* Ensure envelope is above the hidden letter */
+        }
+
+        .envelope::before {
+            content: "";
+            position: absolute;
+            top: 0; z-index: 14;
+            border-top: 110px solid var(--primary-pink);
+            border-left: 160px solid transparent;
+            border-right: 160px solid transparent;
+            transform-origin: top;
+            transition: transform 0.4s 0.2s, z-index 0.2s 0.4s;
+        }
+
+        .envelope::after {
+            content: "";
+            position: absolute;
+            z-index: 13;
+            width: 0; height: 0;
+            border-top: 110px solid transparent;
+            border-left: 160px solid #f8bbd0;
+            border-right: 160px solid #f8bbd0;
+            border-bottom: 110px solid #f8bbd0;
+            bottom: 0;
+        }
+
+        .envelope-wrapper.open .envelope { opacity: 0; visibility: hidden; transition: opacity 0.5s; }
+        .envelope-wrapper.open .envelope::before { transform: rotateX(180deg); }
+
+        .letter {
+            position: absolute;
+            top: 20px; left: 10px; width: 300px; height: 180px;
+            background: var(--parchment);
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 2;
+            padding: 20px;
+            border-radius: 4px;
+            overflow: hidden;
+            pointer-events: none;
+            opacity: 0; /* FIX: Hidden until opened */
+        }
+
+        .envelope-wrapper.open .letter {
+            position: fixed;
+            top: 50%; left: 50%;
+            width: 90vw; max-width: 600px; 
+            height: auto; 
+            max-height: 85vh;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            opacity: 1;
+            padding: 80px 60px;
+            box-shadow: 0 25px 60px rgba(216, 27, 96, 0.2);
+            border: 1px solid rgba(216, 27, 96, 0.1);
+            background-color: var(--parchment);
+            background-image: url("https://www.transparenttextures.com/patterns/floral-paper.png");
+            pointer-events: auto;
+            overflow-y: auto;
+            cursor: default;
+        }
+
+        /* NEW: Letter Border */
+        .letter-border {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            border: 1px solid var(--inner-border);
+            pointer-events: none;
+            z-index: 1;
+        }
+        .letter-border::after {
+            content: "";
+            position: absolute;
+            top: 5px; left: 5px; right: 5px; bottom: 5px;
+            border: 2px solid var(--inner-border);
+            opacity: 0.5;
+        }
+
+        .letter-content {
+            opacity: 0;
+            transition: opacity 0.5s 0.6s;
+            position: relative;
+            z-index: 5;
+        }
+
+        .envelope-wrapper.open .letter-content { opacity: 1; }
+
+        .recipient-name {
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.8rem;
+            color: var(--deep-rose);
+            margin-bottom: 30px;
+            display: block;
+        }
+
+        .main-text {
+            font-family: 'Lora', serif;
+            font-style: italic;
+            font-size: 1.2rem;
+            line-height: 2;
+            color: #333;
+        }
+
+        .sender-name {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.2rem;
+            text-align: right;
+            display: block;
+            margin-top: 40px;
+            color: var(--deep-rose);
+        }
+
+        /* Interactive Emoji */
+        .love-emoji {
+            display: inline-block;
+            cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin: 0 4px;
+            vertical-align: middle;
+        }
+        .love-emoji:hover { transform: scale(1.6) rotate(10deg); }
+        .emoji-pop { animation: emoji-burst 0.6s forwards; }
+
+        @keyframes emoji-burst {
+            0% { transform: scale(1); }
+            50% { transform: scale(2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .wax-seal {
+            position: absolute;
+            top: 90px; left: 137px; width: 45px; height: 45px;
+            background: #b71c1c;
+            border-radius: 50%;
+            z-index: 15;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 24px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .envelope-wrapper.open .wax-seal { opacity: 0; }
+
+        .instruction {
+            position: absolute;
+            bottom: -60px; width: 100%; text-align: center;
+            color: var(--deep-rose); font-weight: 700;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 230, 235, 0);
+            pointer-events: none;
+            transition: 0.5s;
+            z-index: 900;
+        }
+        .envelope-wrapper.open ~ .overlay {
+            background: rgba(255, 230, 235, 0.5);
+            backdrop-filter: blur(4px);
+            pointer-events: auto;
+        }
+
+        .close-btn {
+            display: block;
+            margin: 50px auto 0;
+            padding: 10px 30px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--deep-rose);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .close-btn:hover { background: var(--border-color); color: white; }
+
+        /* DECOR */
+        .flower-corner {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            opacity: 0.05;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .top-right { top: -20px; right: -20px; transform: rotate(90deg); }
+        .bottom-left { bottom: -20px; left: -20px; transform: rotate(-90deg); }
+
+        @media (max-width: 600px) {
+            .envelope-wrapper.open .letter { width: 85vw; padding: 50px 30px; }
+            .letter-border { top: 10px; left: 10px; right: 10px; bottom: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-decor" id="bg-decor"></div>
+
+    <div class="envelope-container">
+        <div class="envelope-wrapper" id="envelope">
+            <div class="envelope">
+                <div class="wax-seal">❤</div>
+            </div>
+            
+            <div class="letter" id="letter">
+                <div class="letter-border"></div>
+                <!-- Decorative background elements -->
+                <svg class="flower-corner top-right" viewBox="0 0 100 100">
+                    <path d="M0,100 C30,100 100,70 100,0 L100,100 Z" fill="var(--deep-rose)" />
+                </svg>
+                <svg class="flower-corner bottom-left" viewBox="0 0 100 100">
+                    <path d="M0,100 C30,100 100,70 100,0 L100,100 Z" fill="var(--deep-rose)" />
+                </svg>
+
+                <div class="letter-content">
+                    <span class="recipient-name">Dearest [girlFriendName],</span>
+                    <div class="main-text">
+                        I am so lucky to have you in my life. Every moment we spend together feels like a dream I never want to wake up from. 
+                        <script>document.write(Emoji('💖'))</script>
+                        <br><br>
+                        Distance is just a physical gap between us, but in every other way, we are closer than ever. 
+                        <script>document.write(Emoji('🌹'))</script> 
+                        I carry your laugh in my head and your love in my heart every single day.
+                        <br><br>
+                        Meeting you was the best thing that ever happened to me, and I promise to spend the rest of our days making sure you know how special you are. You're my favorite person, my best friend, and my whole world. 
+                        <script>document.write(Emoji('✨'))</script>
+                        <br><br>
+                        Happy Valentine's Day. I love you more than words can say. 
+                        <script>document.write(Emoji('💌'))</script>
+                    </div>
+                    <span class="sender-name">Forever yours, <br>[boyFriendName]</span>
+                    <button class="close-btn" onclick="event.stopPropagation(); closeLetter()">Close Letter</button>
+                </div>
+            </div>
+            
+            <div class="instruction">Tap to open my heart</div>
+        </div>
+        <div class="overlay" onclick="closeLetter()"></div>
+    </div>
+
+    <script>
+        const envelopeWrapper = document.getElementById('envelope');
+        
+        envelopeWrapper.addEventListener('click', () => {
+            if (!envelopeWrapper.classList.contains('open')) {
+                envelopeWrapper.classList.add('open');
+                document.querySelector('.instruction').style.display = 'none';
+            }
+        });
+
+        function closeLetter() {
+            envelopeWrapper.classList.remove('open');
+            setTimeout(() => {
+                document.querySelector('.instruction').style.display = 'block';
+            }, 800);
+        }
+
+        function triggerEmojiPop(el) {
+            el.classList.add('emoji-pop');
+            setTimeout(() => el.classList.remove('emoji-pop'), 600);
+            for(let i=0; i<6; i++) createParticle(el);
+        }
+
+        function createParticle(el) {
+            const rect = el.getBoundingClientRect();
+            const p = document.createElement('div');
+            p.innerHTML = ['❤', '💖', '✨', '🌸'][Math.floor(Math.random()*4)];
+            p.style.position = 'fixed';
+            p.style.left = rect.left + rect.width/2 + 'px';
+            p.style.top = rect.top + rect.height/2 + 'px';
+            p.style.pointerEvents = 'none';
+            p.style.zIndex = '2000';
+            document.body.appendChild(p);
+
+            p.animate([
+                { transform: 'translate(0,0) scale(1)', opacity: 1 },
+                { transform: `translate(${(Math.random()-0.5)*150}px, ${(Math.random()-0.5)*150}px) scale(0)`, opacity: 0 }
+            ], { duration: 800 }).onfinish = () => p.remove();
+        }
+
+        function createDecor() {
+            const container = document.getElementById('bg-decor');
+            for (let i = 0; i < 30; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.innerHTML = '❤';
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDuration = (Math.random() * 5 + 10) + 's';
+                heart.style.animationDelay = (Math.random() * 5) + 's';
+                container.appendChild(heart);
+            }
+        }
+        window.onload = createDecor;
+    </script>
+</body>
+</html>
