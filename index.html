@@ -55,7 +55,6 @@
             color: rgba(216, 27, 96, 0.2);
             animation: float 15s linear infinite;
             z-index: 1;
-            /* Base size will be overridden by JS */
             font-size: 1.5rem; 
         }
 
@@ -206,6 +205,7 @@
 
         .love-emoji {
             display: inline-block;
+            font-style: normal; 
             cursor: pointer;
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             margin: 0 4px;
@@ -355,51 +355,50 @@
         function triggerEmojiPop(el) {
             el.classList.add('emoji-pop');
             setTimeout(() => el.classList.remove('emoji-pop'), 600);
-            for(let i=0; i<6; i++) createParticle(el);
+            for(let i=0; i<10; i++) createParticle(el);
         }
 
         function createParticle(el) {
             const rect = el.getBoundingClientRect();
             const p = document.createElement('div');
-            p.innerHTML = ['❤', '💖', '✨', '🌸'][Math.floor(Math.random()*4)];
+            
+            // Explicitly colorful emojis to avoid the default black text glyph
+            const romanticEmojis = ['💖', '💗', '💓', '✨', '🌸', '🌹', '💝', '💕'];
+            p.innerHTML = romanticEmojis[Math.floor(Math.random() * romanticEmojis.length)];
+            
             p.style.position = 'fixed';
             p.style.left = rect.left + rect.width/2 + 'px';
             p.style.top = rect.top + rect.height/2 + 'px';
             p.style.pointerEvents = 'none';
             p.style.zIndex = '2000';
+            p.style.fontStyle = 'normal';
+            // Force a romantic color in case the emoji renders as a path
+            p.style.color = '#d81b60'; 
+            
             document.body.appendChild(p);
 
             p.animate([
                 { transform: 'translate(0,0) scale(1)', opacity: 1 },
-                { transform: `translate(${(Math.random()-0.5)*150}px, ${(Math.random()-0.5)*150}px) scale(0)`, opacity: 0 }
-            ], { duration: 800 }).onfinish = () => p.remove();
+                { transform: `translate(${(Math.random()-0.5)*200}px, ${(Math.random()-0.5)*200}px) scale(0)`, opacity: 0 }
+            ], { duration: 1000, easing: 'ease-out' }).onfinish = () => p.remove();
         }
 
         function createDecor() {
             const container = document.getElementById('bg-decor');
-            const icons = ['❤', '💖', '✨', '🌸', '💕', '🌹', '💌', '💎', '💘', '💝', '👨🏽‍❤️‍👩'];
-            const count = 80; // Significantly more emojis
+            const icons = ['❤', '💖', '✨', '🌸', '💕', '🌹', '💌', '💎', '💘', '💝'];
+            const count = 80; 
             
             for (let i = 0; i < count; i++) {
                 const heart = document.createElement('div');
                 heart.className = 'heart';
                 heart.innerHTML = icons[Math.floor(Math.random() * icons.length)];
-                
-                // Randomize positions
                 heart.style.left = Math.random() * 100 + 'vw';
                 heart.style.top = Math.random() * 100 + 'vh'; 
-                
-                // Randomize sizes (between 1rem and 3rem)
                 const size = (Math.random() * 2 + 1) + 'rem';
                 heart.style.fontSize = size;
-                
-                // Randomize animation speed and delay
                 heart.style.animationDuration = (Math.random() * 8 + 10) + 's';
                 heart.style.animationDelay = (Math.random() * -20) + 's';
-                
-                // Vary opacity slightly for depth
                 heart.style.opacity = (Math.random() * 0.3 + 0.1).toString();
-                
                 container.appendChild(heart);
             }
         }
