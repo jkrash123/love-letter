@@ -43,21 +43,27 @@
 
         .background-decor {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0; left: 0; 
+            width: 100%; height: 100%;
             pointer-events: none;
-            z-index: -1;
+            z-index: 1; 
             overflow: hidden;
         }
 
         .heart {
             position: absolute;
-            color: rgba(216, 27, 96, 0.15);
+            color: rgba(216, 27, 96, 0.2);
             animation: float 15s linear infinite;
+            z-index: 1;
+            /* Base size will be overridden by JS */
+            font-size: 1.5rem; 
         }
 
         @keyframes float {
             0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
-            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(-15vh) rotate(360deg); opacity: 0; }
         }
 
         .envelope-container {
@@ -65,6 +71,8 @@
             justify-content: center;
             align-items: center;
             perspective: 1000px;
+            position: relative;
+            z-index: 10;
         }
 
         .envelope-wrapper {
@@ -83,7 +91,7 @@
             background: #ffffff;
             border-radius: 0 0 8px 8px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            z-index: 10; /* Ensure envelope is above the hidden letter */
+            z-index: 10;
         }
 
         .envelope::before {
@@ -122,19 +130,19 @@
             border-radius: 4px;
             overflow: hidden;
             pointer-events: none;
-            opacity: 0; /* FIX: Hidden until opened */
+            opacity: 0;
         }
 
         .envelope-wrapper.open .letter {
             position: fixed;
             top: 50%; left: 50%;
-            width: 90vw; max-width: 600px; 
+            width: 90vw; max-width: 650px; 
             height: auto; 
-            max-height: 85vh;
+            max-height: 90vh;
             transform: translate(-50%, -50%);
             z-index: 1000;
             opacity: 1;
-            padding: 80px 60px;
+            padding: 60px 50px;
             box-shadow: 0 25px 60px rgba(216, 27, 96, 0.2);
             border: 1px solid rgba(216, 27, 96, 0.1);
             background-color: var(--parchment);
@@ -144,13 +152,12 @@
             cursor: default;
         }
 
-        /* NEW: Letter Border */
         .letter-border {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 20px;
-            bottom: 20px;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
             border: 1px solid var(--inner-border);
             pointer-events: none;
             z-index: 1;
@@ -174,30 +181,29 @@
 
         .recipient-name {
             font-family: 'Great Vibes', cursive;
-            font-size: 2.8rem;
+            font-size: 3.2rem;
             color: var(--deep-rose);
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             display: block;
         }
 
         .main-text {
             font-family: 'Lora', serif;
             font-style: italic;
-            font-size: 1.2rem;
-            line-height: 2;
+            font-size: 1.45rem;
+            line-height: 1.8;
             color: #333;
         }
 
         .sender-name {
             font-family: 'Dancing Script', cursive;
-            font-size: 2.2rem;
+            font-size: 2.5rem;
             text-align: right;
             display: block;
-            margin-top: 40px;
+            margin-top: 35px;
             color: var(--deep-rose);
         }
 
-        /* Interactive Emoji */
         .love-emoji {
             display: inline-block;
             cursor: pointer;
@@ -255,7 +261,7 @@
 
         .close-btn {
             display: block;
-            margin: 50px auto 0;
+            margin: 40px auto 0;
             padding: 10px 30px;
             background: transparent;
             border: 1px solid var(--border-color);
@@ -266,7 +272,6 @@
         }
         .close-btn:hover { background: var(--border-color); color: white; }
 
-        /* DECOR */
         .flower-corner {
             position: absolute;
             width: 180px;
@@ -279,8 +284,10 @@
         .bottom-left { bottom: -20px; left: -20px; transform: rotate(-90deg); }
 
         @media (max-width: 600px) {
-            .envelope-wrapper.open .letter { width: 85vw; padding: 50px 30px; }
+            .envelope-wrapper.open .letter { width: 92vw; padding: 45px 25px; }
             .letter-border { top: 10px; left: 10px; right: 10px; bottom: 10px; }
+            .main-text { font-size: 1.2rem; }
+            .recipient-name { font-size: 2.6rem; }
         }
     </style>
 </head>
@@ -296,7 +303,6 @@
             
             <div class="letter" id="letter">
                 <div class="letter-border"></div>
-                <!-- Decorative background elements -->
                 <svg class="flower-corner top-right" viewBox="0 0 100 100">
                     <path d="M0,100 C30,100 100,70 100,0 L100,100 Z" fill="var(--deep-rose)" />
                 </svg>
@@ -308,14 +314,16 @@
                     <span class="recipient-name">Dearest Lala,</span>
                     <div class="main-text">
                         I am so grateful and lucky to have you in my life <script>document.write(Emoji('💖'))</script>. 
+                        <br>
                         You give me so much joy, love, care and kindness. With you, my life feels warm and full of love <script>document.write(Emoji('🥰'))</script>.
                         <br><br>
-                        Our love is so genuine, pure, raw and always growing, even if we are physically apart right now <script>document.write(Emoji('💞'))</script>.
+                        Our love is so genuine, pure, raw and always growing, even if we are physically apart right now <script>document.write(Emoji('💗'))</script>.
                         <br><br>
-                        I can't wait to see you again my baby and I love you soooooooooooooooo soooooooooooooooo much <script>document.write(Emoji('😍'))</script>.
+                        I can't wait to see you again my baby and I love you soooo soooo much <script>document.write(Emoji('😍'))</script>.
                         <br><br>
-                        Happy Valentine's Day my Baby Princess Cut Diamond Love <script>document.write(Emoji('💎'))</script>.
-                        <script>document.write(Emoji('💌'))</script>
+                        Happy Valentine's Day My Love <script>document.write(Emoji('💎'))</script>
+                        <script>document.write(Emoji('😘'))</script>
+                        <script>document.write(Emoji('💞'))</script>
                     </div>
                     <span class="sender-name">Forever yours, <br>Joshua</span>
                     <button class="close-btn" onclick="event.stopPropagation(); closeLetter()">Close Letter</button>
@@ -369,13 +377,29 @@
 
         function createDecor() {
             const container = document.getElementById('bg-decor');
-            for (let i = 0; i < 30; i++) {
+            const icons = ['❤', '💖', '✨', '🌸', '💕', '🌹', '💌', '💎', '💘', '💝', '👨🏽‍❤️‍👩'];
+            const count = 80; // Significantly more emojis
+            
+            for (let i = 0; i < count; i++) {
                 const heart = document.createElement('div');
                 heart.className = 'heart';
-                heart.innerHTML = '❤';
+                heart.innerHTML = icons[Math.floor(Math.random() * icons.length)];
+                
+                // Randomize positions
                 heart.style.left = Math.random() * 100 + 'vw';
-                heart.style.animationDuration = (Math.random() * 5 + 10) + 's';
-                heart.style.animationDelay = (Math.random() * 5) + 's';
+                heart.style.top = Math.random() * 100 + 'vh'; 
+                
+                // Randomize sizes (between 1rem and 3rem)
+                const size = (Math.random() * 2 + 1) + 'rem';
+                heart.style.fontSize = size;
+                
+                // Randomize animation speed and delay
+                heart.style.animationDuration = (Math.random() * 8 + 10) + 's';
+                heart.style.animationDelay = (Math.random() * -20) + 's';
+                
+                // Vary opacity slightly for depth
+                heart.style.opacity = (Math.random() * 0.3 + 0.1).toString();
+                
                 container.appendChild(heart);
             }
         }
